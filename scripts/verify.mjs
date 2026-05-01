@@ -114,8 +114,13 @@ async function stopChild(child) {
 }
 
 async function latestReleaseAsset(repo, assetName) {
+  const headers = { "User-Agent": "lasso-bpmn-server-verify" };
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+
   const response = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, {
-    headers: { "User-Agent": "lasso-bpmn-server-verify" },
+    headers,
   });
   if (!response.ok) {
     throw new Error(`Failed to read latest release for ${repo}: ${response.status} ${await response.text()}`);

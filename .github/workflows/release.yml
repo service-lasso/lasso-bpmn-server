@@ -50,6 +50,7 @@ jobs:
         env:
           TARGET_PLATFORM: ${{ matrix.platform }}
           BPMN_SERVER_VERSION: ${{ matrix.service-version }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: npm test
 
       - name: Upload packaged artifact
