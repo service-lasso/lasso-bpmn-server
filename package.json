@@ -9,6 +9,7 @@
     "release:verify": "node scripts/verify.mjs"
   },
   "dependencies": {
+    "adm-zip": "^0.5.16",
     "archiver": "^7.0.1"
   }
 }

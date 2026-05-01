@@ -1,4 +1,5 @@
 import { spawn, spawnSync } from "node:child_process";
+import AdmZip from "adm-zip";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
@@ -26,6 +27,16 @@ function run(command, args, options = {}) {
   if (result.status !== 0) {
     throw new Error(`${command} ${args.join(" ")} failed with exit code ${result.status}`);
   }
+}
+
+function extractArchive(archivePath, targetPath) {
+  if (archivePath.endsWith(".zip")) {
+    const zip = new AdmZip(archivePath);
+    zip.extractAllTo(targetPath, true);
+    return;
+  }
+
+  run("tar", ["-xf", archivePath, "-C", targetPath]);
 }
 
 async function reserveLoopbackPort() {
@@ -149,10 +160,10 @@ await rm(verifyRoot, { recursive: true, force: true });
 await mkdir(bpmnExtractRoot, { recursive: true });
 await mkdir(mongoExtractRoot, { recursive: true });
 
-run("tar", ["-xf", artifact, "-C", bpmnExtractRoot]);
+extractArchive(artifact, bpmnExtractRoot);
 const mongoUrl = await latestReleaseAsset("service-lasso/lasso-mongo", mongoAssetName);
 await downloadFile(mongoUrl, mongoArchive);
-run("tar", ["-xf", mongoArchive, "-C", mongoExtractRoot]);
+extractArchive(mongoArchive, mongoExtractRoot);
 
 const mongo = spawn(process.execPath, ["./lasso-mongo.mjs"], {
   cwd: mongoExtractRoot,
