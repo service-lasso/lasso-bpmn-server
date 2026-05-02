@@ -57,9 +57,10 @@ async function writeRuntimePackage(appTarget) {
     license: "ISC",
     dependencies: {
       "@fortawesome/fontawesome-free": "^6.7.2",
+      "@sendgrid/mail": "8.1.6",
       "body-parser": "^1.20.3",
-      "bootstrap": "^3.4.1",
-      "bpmn-server": "1.3.15",
+      "bootstrap": "5.3.8",
+      "bpmn-server": "2.3.8",
       "chart.js": "^2.9.4",
       "chalk": "^2.4.2",
       "compression": "^1.7.5",
@@ -73,12 +74,11 @@ async function writeRuntimePackage(appTarget) {
       "fs-extra": "^9.1.0",
       "jquery": "^3.7.1",
       "lusca": "^1.7.0",
-      "mongoose": "6.5.1",
+      "mongoose": "6.13.9",
       "morgan": "^1.10.0",
       "multer": "^2.0.2",
       "popper.js": "^1.16.1",
-      "pug": "^3.0.3",
-      "v": "^0.3.0"
+      "pug": "^3.0.3"
     }
   };
 
@@ -112,9 +112,10 @@ export async function packageBpmnServer(platform = process.platform) {
     packagedBy: "service-lasso/lasso-bpmn-server",
     platform,
     upstream: {
-      donor: "TypeRefinery bpmn-server",
+      source: "BPMN Server WebApp",
       npm: {
-        "bpmn-server": "1.3.15"
+        "bpmn-server": "2.3.8",
+        "mongoose": "6.13.9"
       }
     }
   };

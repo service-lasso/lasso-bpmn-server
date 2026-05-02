@@ -177,7 +177,9 @@ class Workflow extends common_1.Common {
             }
         })));
         router.get('/mocha', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
-            const mocha = require('../node_modules/mocha/bin/mocha');
+            response.status(410).json({
+                error: 'The embedded Mocha debug runner is disabled in the packaged Service Lasso runtime.'
+            });
         })));
         router.get('/run/:process', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             let process = request.params.process;

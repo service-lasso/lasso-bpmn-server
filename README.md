@@ -7,7 +7,7 @@ This service packages the TypeRefinery BPMN Server app as an app-owned business-
 ## What It Packages
 
 - BPMN Server app version `1.0.0`
-- Donor web UI, Pug views, modeler assets, API routes, and sample BPMN definitions
+- Web UI, Pug views, modeler assets, API routes, and sample BPMN definitions
 - `src/lasso-bpmn-server.cjs`, a Service Lasso launcher that prepares environment defaults, seeds definitions into the data path, starts the app, and exposes `/healthcheck`
 
 Release artifacts are:
@@ -37,7 +37,13 @@ npm install
 npm test
 ```
 
-The verifier packages the current platform, downloads the latest released `lasso-mongo` artifact, starts MongoDB, starts the packaged BPMN Server against that MongoDB instance, checks `/healthcheck`, checks `/`, checks `/api/engine/status?apiKey=typerefinery`, and stops both processes.
+The verifier packages the current platform, runs `npm audit --omit=dev --ignore-scripts --json` against the packaged runtime app, downloads the latest released `lasso-mongo` artifact, starts MongoDB, starts the packaged BPMN Server against that MongoDB instance, checks `/healthcheck`, checks `/`, checks `/mocha` is disabled, checks `/api/engine/status?apiKey=typerefinery`, and stops both processes.
+
+## Dependency Hardening
+
+The packaged runtime uses `bpmn-server` `2.3.8` and `mongoose` `6.13.9`. Formerly transitive runtime dependencies, including SendGrid mail support, are declared explicitly so the packaged service is not coupled to an older upstream dependency tree.
+
+See [docs/dependency-audit.md](docs/dependency-audit.md).
 
 ## URL Contracts
 

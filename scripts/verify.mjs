@@ -29,6 +29,40 @@ function run(command, args, options = {}) {
   }
 }
 
+function npmCommand(args, options = {}) {
+  if (process.platform === "win32") {
+    return spawnSync("cmd.exe", ["/d", "/s", "/c", ["npm", ...args].join(" ")], {
+      cwd: repoRoot,
+      encoding: "utf8",
+      ...options,
+    });
+  }
+
+  return spawnSync("npm", args, {
+    cwd: repoRoot,
+    encoding: "utf8",
+    ...options,
+  });
+}
+
+function verifyRuntimeAudit(appPath) {
+  const result = npmCommand(["audit", "--omit=dev", "--ignore-scripts", "--json"], {
+    cwd: appPath,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+  if (!result.stdout) {
+    throw new Error(`npm audit produced no JSON output: ${result.stderr ?? ""}`);
+  }
+
+  const audit = JSON.parse(result.stdout);
+  const total = audit.metadata?.vulnerabilities?.total ?? 0;
+  if (total !== 0) {
+    throw new Error(`Runtime npm audit found ${total} vulnerabilities: ${JSON.stringify(audit.metadata.vulnerabilities)}`);
+  }
+  console.log("[lasso-bpmn-server] verified packaged runtime npm audit has 0 vulnerabilities");
+}
+
 function extractArchive(archivePath, targetPath) {
   if (archivePath.endsWith(".zip")) {
     const zip = new AdmZip(archivePath);
@@ -166,6 +200,7 @@ await mkdir(bpmnExtractRoot, { recursive: true });
 await mkdir(mongoExtractRoot, { recursive: true });
 
 extractArchive(artifact, bpmnExtractRoot);
+verifyRuntimeAudit(path.join(bpmnExtractRoot, "app"));
 const mongoUrl = await latestReleaseAsset("service-lasso/lasso-mongo", mongoAssetName);
 await downloadFile(mongoUrl, mongoArchive);
 extractArchive(mongoArchive, mongoExtractRoot);
@@ -230,6 +265,7 @@ try {
 
   await waitForHttp(`http://127.0.0.1:${bpmnPort}/healthcheck`);
   await waitForHttp(`http://127.0.0.1:${bpmnPort}/`);
+  await waitForHttp(`http://127.0.0.1:${bpmnPort}/mocha`, 410);
 
   const apiResponse = await waitForHttp(`http://127.0.0.1:${bpmnPort}/api/engine/status?apiKey=typerefinery`);
   const apiBody = await apiResponse.json();
