@@ -1,5 +1,5 @@
 
-import { Configuration, ModelsDatastore, DataStore , Logger } from './';
+import { Configuration, ModelsDatastore, DataStore, Logger, NoCacheManager, ScriptHandler } from './';
 import { MyAppDelegate } from './appDelegate';
 import { IAM, ACL } from './';
 
@@ -35,6 +35,12 @@ var configuration = new Configuration(
 		},		
 		dataStore: function (server) {
 			return new DataStore(server);
+		},
+		cacheManager: function (server) {
+			return new NoCacheManager(server);
+		},
+		scriptHandler: function (server) {
+			return new ScriptHandler();
 		},
 		IAM: function (server) {
 			return new IAM(server);

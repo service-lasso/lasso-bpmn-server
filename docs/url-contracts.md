@@ -12,6 +12,12 @@
 | `GET` | `/model/export` | export model form |
 | `GET` | `/docs` | BPMN Server docs view |
 
+## Disabled Runtime Debug Routes
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/mocha` | Returns `410`. The embedded Mocha debug runner is intentionally disabled in the packaged runtime so the service does not ship a test runner dependency. |
+
 ## Health
 
 | Method | Path | Purpose |

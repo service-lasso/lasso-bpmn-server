@@ -34,6 +34,12 @@ var configuration = new _1.Configuration({
     dataStore: function (server) {
         return new _1.DataStore(server);
     },
+    cacheManager: function (server) {
+        return new _1.NoCacheManager(server);
+    },
+    scriptHandler: function (server) {
+        return new _1.ScriptHandler();
+    },
     IAM: function (server) {
         return new _2.IAM(server);
     },
