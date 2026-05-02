@@ -42,3 +42,7 @@ The verifier packages the current platform, downloads the latest released `lasso
 ## URL Contracts
 
 See [docs/url-contracts.md](docs/url-contracts.md).
+
+## Client Samples
+
+The old BPMN client sample is documented as API/client usage, not as a separate managed service. See [docs/client-sample.md](docs/client-sample.md).
