@@ -37,3 +37,5 @@ All API routes require `x-api-key: typerefinery` or `?apiKey=typerefinery`.
 ## Migration Notes
 
 The old TypeRefinery service used the same app routes and default port `8190`. The Service Lasso package adds `/healthcheck` and resolves the definitions directory from `${SERVICE_DATA_PATH}` so model definitions live in runtime-managed service data instead of only inside the immutable release artifact.
+
+Client scripts should call these API routes through `BPMN_URL` and `API_KEY`; see [client-sample.md](client-sample.md). The BPMN client sample is not a separate Service Lasso service.
