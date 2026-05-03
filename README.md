@@ -2,7 +2,7 @@
 
 Release-backed BPMN Server package for Service Lasso.
 
-This service packages the TypeRefinery BPMN Server app as an app-owned business-process service. It depends on the core `@node` provider and the app-owned `mongo` service.
+This service packages a BPMN modeling and execution server as an app-owned business-process service. It depends on the core `@node` provider and the app-owned `mongo` service.
 
 ## What It Packages
 
@@ -49,6 +49,6 @@ See [docs/dependency-audit.md](docs/dependency-audit.md).
 
 See [docs/url-contracts.md](docs/url-contracts.md).
 
-## Client Samples
+## Client Usage
 
-The old BPMN client sample is documented as API/client usage, not as a separate managed service. See [docs/client-sample.md](docs/client-sample.md).
+Client-side BPMN integration is documented as API usage, not as a separate managed Service Lasso service. See [docs/client-sample.md](docs/client-sample.md).
