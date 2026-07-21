@@ -26,7 +26,8 @@ Release artifacts are:
 - API key: `typerefinery`
 - Mongo database: `bpmn`
 - Mongo dependency: `mongo`
-- Healthcheck: `GET /healthcheck`
+- Readiness: canonical `healthchecks[]` HTTP check `http-ready`
+- Health endpoint: `GET /healthcheck`
 
 The manifest exports `BPMN_URL` and `BPMN_PORT` through `globalenv`.
 

@@ -194,6 +194,24 @@ if (serviceManifest.id !== "bpmn-server" || serviceManifest.version !== serviceV
 if (!serviceManifest.execconfig?.depend_on?.includes("@node") || !serviceManifest.execconfig.depend_on.includes("mongo")) {
   throw new Error("BPMN Server manifest must depend on @node and mongo.");
 }
+if ("healthcheck" in serviceManifest.execconfig) {
+  throw new Error("BPMN Server manifest must use canonical execconfig.healthchecks[], not execconfig.healthcheck.");
+}
+const healthchecks = serviceManifest.execconfig?.healthchecks;
+if (!Array.isArray(healthchecks) || healthchecks.length !== 1) {
+  throw new Error("BPMN Server manifest must declare exactly one canonical healthchecks[] item.");
+}
+const [httpReadyCheck] = healthchecks;
+if (
+  httpReadyCheck.id !== "http-ready" ||
+  httpReadyCheck.type !== "http" ||
+  httpReadyCheck.url !== "http://127.0.0.1:${SERVICE_PORT}/healthcheck" ||
+  httpReadyCheck.expected_status !== 200 ||
+  httpReadyCheck.retries !== 180 ||
+  httpReadyCheck.interval !== 500
+) {
+  throw new Error(`Unexpected BPMN Server healthchecks[] contract: ${JSON.stringify(httpReadyCheck)}`);
+}
 
 await rm(verifyRoot, { recursive: true, force: true });
 await mkdir(bpmnExtractRoot, { recursive: true });

@@ -61,13 +61,16 @@
       "BPMN_PORT": "${SERVICE_PORT}"
     },
     "serviceport": 8190,
-    "healthcheck": {
-      "type": "http",
-      "url": "http://127.0.0.1:${SERVICE_PORT}/healthcheck",
-      "expected_status": 200,
-      "retries": 180,
-      "interval_ms": 500
-    },
+    "healthchecks": [
+      {
+        "id": "http-ready",
+        "type": "http",
+        "url": "http://127.0.0.1:${SERVICE_PORT}/healthcheck",
+        "expected_status": 200,
+        "retries": 180,
+        "interval": 500
+      }
+    ],
     "depend_on": [
       "@node",
       "mongo"
