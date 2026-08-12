@@ -9,6 +9,7 @@
   "icon": "pi pi-globe",
   "servicelocation": 10,
   "artifact": {
+    "kind": "archive",
     "source": {
       "type": "github-release",
       "repo": "service-lasso/lasso-bpmn-server",
@@ -16,19 +17,31 @@
     },
     "platforms": {
       "win32": {
-        "asset": "lasso-bpmn-server-1.0.0-win32.zip",
-        "archive": "zip",
-        "command": "./src/lasso-bpmn-server.cjs"
+        "assetName": "lasso-bpmn-server-1.0.0-win32.zip",
+        "archiveType": "zip",
+        "command": "./src/lasso-bpmn-server.cjs",
+        "checksum": {
+          "algorithm": "sha256",
+          "assetName": "SHA256SUMS.txt"
+        }
       },
       "linux": {
-        "asset": "lasso-bpmn-server-1.0.0-linux.tar.gz",
-        "archive": "tar.gz",
-        "command": "./src/lasso-bpmn-server.cjs"
+        "assetName": "lasso-bpmn-server-1.0.0-linux.tar.gz",
+        "archiveType": "tar.gz",
+        "command": "./src/lasso-bpmn-server.cjs",
+        "checksum": {
+          "algorithm": "sha256",
+          "assetName": "SHA256SUMS.txt"
+        }
       },
       "darwin": {
-        "asset": "lasso-bpmn-server-1.0.0-darwin.tar.gz",
-        "archive": "tar.gz",
-        "command": "./src/lasso-bpmn-server.cjs"
+        "assetName": "lasso-bpmn-server-1.0.0-darwin.tar.gz",
+        "archiveType": "tar.gz",
+        "command": "./src/lasso-bpmn-server.cjs",
+        "checksum": {
+          "algorithm": "sha256",
+          "assetName": "SHA256SUMS.txt"
+        }
       }
     }
   },
@@ -61,27 +74,24 @@
       "BPMN_PORT": "${SERVICE_PORT}"
     },
     "serviceport": 8190,
-    "healthchecks": [
-      {
-        "id": "http-ready",
-        "type": "http",
-        "url": "http://127.0.0.1:${SERVICE_PORT}/healthcheck",
-        "expected_status": 200,
-        "retries": 180,
-        "interval": 500
-      }
-    ],
     "depend_on": [
       "@node",
       "mongo"
     ]
   },
-  "updates": {
-    "policy": "notify",
-    "source": {
-      "type": "github-release",
-      "repo": "service-lasso/lasso-bpmn-server",
-      "channel": "latest"
+  "healthchecks": [
+    {
+      "id": "http-ready",
+      "type": "http",
+      "url": "http://127.0.0.1:${SERVICE_PORT}/healthcheck",
+      "expected_status": 200,
+      "retries": 180,
+      "interval": 500
     }
+  ],
+  "updates": {
+    "enabled": true,
+    "mode": "notify",
+    "track": "latest"
   }
 }

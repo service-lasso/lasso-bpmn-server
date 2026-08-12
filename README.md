@@ -18,6 +18,12 @@ Release artifacts are:
 - `service.json`
 - `SHA256SUMS.txt`
 
+## Release Artifact Policy
+
+`service.json` uses the canonical Service Lasso archive contract: `artifact.kind` is `archive`, each platform declares `assetName` and `archiveType`, and each archive is verified against `SHA256SUMS.txt` before extraction.
+
+The manifest intentionally tracks the supported GitHub release channel `latest`, with notify-only update checks also tracking `latest`. This lets a newly published package release resolve to its own assets instead of pinning a previous release. Service Lasso records the concrete resolved release tag in its install lock, so an installed payload remains reproducible until an operator accepts an update.
+
 ## Defaults
 
 - Service id: `bpmn-server`
@@ -26,7 +32,7 @@ Release artifacts are:
 - API key: `typerefinery`
 - Mongo database: `bpmn`
 - Mongo dependency: `mongo`
-- Readiness: canonical `healthchecks[]` HTTP check `http-ready`
+- Readiness: canonical top-level `healthchecks[]` HTTP check `http-ready`
 - Health endpoint: `GET /healthcheck`
 
 The manifest exports `BPMN_URL` and `BPMN_PORT` through `globalenv`.
@@ -42,7 +48,7 @@ The verifier packages the current platform, runs `npm audit --omit=dev --ignore-
 
 ## Dependency Hardening
 
-The packaged runtime uses `bpmn-server` `2.3.8` and `mongoose` `6.13.9`. Formerly transitive runtime dependencies, including SendGrid mail support, are declared explicitly so the packaged service is not coupled to an older upstream dependency tree.
+The packaged runtime uses `bpmn-server` `2.3.8` and `mongoose` `6.13.11`. Formerly transitive runtime dependencies, including SendGrid mail support, are declared explicitly so the packaged service is not coupled to an older upstream dependency tree.
 
 See [docs/dependency-audit.md](docs/dependency-audit.md).
 

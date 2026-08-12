@@ -74,7 +74,7 @@ async function writeRuntimePackage(appTarget) {
       "fs-extra": "^9.1.0",
       "jquery": "^3.7.1",
       "lusca": "^1.7.0",
-      "mongoose": "6.13.9",
+      "mongoose": "6.13.11",
       "morgan": "^1.10.0",
       "multer": "^2.0.2",
       "popper.js": "^1.16.1",
@@ -115,7 +115,7 @@ export async function packageBpmnServer(platform = process.platform) {
       source: "BPMN Server WebApp",
       npm: {
         "bpmn-server": "2.3.8",
-        "mongoose": "6.13.9"
+        "mongoose": "6.13.11"
       }
     }
   };
