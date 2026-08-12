@@ -12,6 +12,6 @@
     "@sendgrid/mail": "8.1.6",
     "bcrypt": "6.0.0",
     "bpmn-server": "2.3.8",
-    "mongoose": "6.13.9"
+    "mongoose": "6.13.11"
   }
 }

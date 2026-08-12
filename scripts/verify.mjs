@@ -63,6 +63,29 @@ function verifyRuntimeAudit(appPath) {
   console.log("[lasso-bpmn-server] verified packaged runtime npm audit has 0 vulnerabilities");
 }
 
+async function verifyRuntimeDependencyLock(appPath) {
+  const runtimePackage = JSON.parse(await readFile(path.join(appPath, "package.json"), "utf8"));
+  const runtimeLock = JSON.parse(await readFile(path.join(appPath, "package-lock.json"), "utf8"));
+  const expectedMongooseVersion = "6.13.11";
+  const declaredVersion = runtimePackage.dependencies?.mongoose;
+  const lockedDeclaration = runtimeLock.packages?.[""]?.dependencies?.mongoose;
+  const installedVersion = runtimeLock.packages?.["node_modules/mongoose"]?.version;
+
+  if (
+    declaredVersion !== expectedMongooseVersion ||
+    lockedDeclaration !== expectedMongooseVersion ||
+    installedVersion !== expectedMongooseVersion
+  ) {
+    throw new Error(`Unexpected packaged Mongoose dependency: ${JSON.stringify({
+      declaredVersion,
+      lockedDeclaration,
+      installedVersion,
+    })}`);
+  }
+
+  console.log(`[lasso-bpmn-server] verified packaged Mongoose ${expectedMongooseVersion} manifest and lockfile`);
+}
+
 function extractArchive(archivePath, targetPath) {
   if (archivePath.endsWith(".zip")) {
     const zip = new AdmZip(archivePath);
@@ -191,8 +214,76 @@ const serviceManifest = JSON.parse(await readFile(path.join(repoRoot, "service.j
 if (serviceManifest.id !== "bpmn-server" || serviceManifest.version !== serviceVersion) {
   throw new Error(`Unexpected manifest identity: ${JSON.stringify({ id: serviceManifest.id, version: serviceManifest.version })}`);
 }
+const expectedArtifactPlatforms = {
+  win32: { assetName: `lasso-bpmn-server-${serviceVersion}-win32.zip`, archiveType: "zip" },
+  linux: { assetName: `lasso-bpmn-server-${serviceVersion}-linux.tar.gz`, archiveType: "tar.gz" },
+  darwin: { assetName: `lasso-bpmn-server-${serviceVersion}-darwin.tar.gz`, archiveType: "tar.gz" },
+};
+const manifestArtifact = serviceManifest.artifact;
+if (
+  manifestArtifact?.kind !== "archive" ||
+  manifestArtifact.source?.type !== "github-release" ||
+  manifestArtifact.source.repo !== "service-lasso/lasso-bpmn-server" ||
+  manifestArtifact.source.channel !== "latest" ||
+  "tag" in manifestArtifact.source
+) {
+  throw new Error(`Unexpected canonical artifact source contract: ${JSON.stringify(manifestArtifact?.source)}`);
+}
+if (
+  serviceManifest.updates?.enabled !== true ||
+  serviceManifest.updates.mode !== "notify" ||
+  serviceManifest.updates.track !== "latest" ||
+  "policy" in serviceManifest.updates ||
+  "source" in serviceManifest.updates
+) {
+  throw new Error(`Unexpected release update policy: ${JSON.stringify(serviceManifest.updates)}`);
+}
+if (
+  !manifestArtifact.platforms ||
+  Object.keys(manifestArtifact.platforms).sort().join(",") !== Object.keys(expectedArtifactPlatforms).sort().join(",")
+) {
+  throw new Error(`Unexpected artifact platforms: ${JSON.stringify(Object.keys(manifestArtifact.platforms ?? {}))}`);
+}
+for (const [platform, expected] of Object.entries(expectedArtifactPlatforms)) {
+  const actual = manifestArtifact.platforms[platform];
+  if (
+    !actual ||
+    "asset" in actual ||
+    "archive" in actual ||
+    actual.assetName !== expected.assetName ||
+    actual.archiveType !== expected.archiveType ||
+    actual.command !== "./src/lasso-bpmn-server.cjs" ||
+    actual.checksum?.algorithm !== "sha256" ||
+    actual.checksum.assetName !== "SHA256SUMS.txt"
+  ) {
+    throw new Error(`Unexpected ${platform} artifact contract: ${JSON.stringify(actual)}`);
+  }
+}
 if (!serviceManifest.execconfig?.depend_on?.includes("@node") || !serviceManifest.execconfig.depend_on.includes("mongo")) {
   throw new Error("BPMN Server manifest must depend on @node and mongo.");
+}
+if ("healthcheck" in serviceManifest) {
+  throw new Error("BPMN Server manifest must use canonical top-level healthchecks[], not singular healthcheck.");
+}
+if ("healthcheck" in serviceManifest.execconfig || "healthchecks" in serviceManifest.execconfig) {
+  throw new Error("BPMN Server manifest healthchecks must be top-level, not nested under execconfig.");
+}
+const healthchecks = serviceManifest.healthchecks;
+if (!Array.isArray(healthchecks) || healthchecks.length !== 1) {
+  throw new Error("BPMN Server manifest must declare exactly one canonical top-level healthchecks[] item.");
+}
+const [httpReadyCheck] = healthchecks;
+if (
+  httpReadyCheck.id !== "http-ready" ||
+  httpReadyCheck.type !== "http" ||
+  httpReadyCheck.url !== "http://127.0.0.1:${SERVICE_PORT}/healthcheck" ||
+  httpReadyCheck.expected_status !== 200 ||
+  httpReadyCheck.retries !== 180 ||
+  httpReadyCheck.interval !== 500 ||
+  "tcphost" in httpReadyCheck ||
+  "tcpport" in httpReadyCheck
+) {
+  throw new Error(`Unexpected BPMN Server healthchecks[] contract: ${JSON.stringify(httpReadyCheck)}`);
 }
 
 await rm(verifyRoot, { recursive: true, force: true });
@@ -200,6 +291,7 @@ await mkdir(bpmnExtractRoot, { recursive: true });
 await mkdir(mongoExtractRoot, { recursive: true });
 
 extractArchive(artifact, bpmnExtractRoot);
+await verifyRuntimeDependencyLock(path.join(bpmnExtractRoot, "app"));
 verifyRuntimeAudit(path.join(bpmnExtractRoot, "app"));
 const mongoUrl = await latestReleaseAsset("service-lasso/lasso-mongo", mongoAssetName);
 await downloadFile(mongoUrl, mongoArchive);

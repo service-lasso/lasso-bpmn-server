@@ -7,7 +7,7 @@ Do not treat `app/package.json` as the release dependency contract. The package 
 ## Current Runtime Dependency Position
 
 - `bpmn-server` is packaged at `2.3.8`.
-- `mongoose` is packaged at `6.13.9`.
+- `mongoose` is packaged at `6.13.11`; this includes the fix for [GHSA-664h-wqgq-64gw](https://github.com/advisories/GHSA-664h-wqgq-64gw), which affects Mongoose versions before `6.13.10`.
 - `@sendgrid/mail` is explicit at `8.1.6` because the app delegate can send mail when `SENDGRID_API_KEY` is set.
 - The unused `v` package is not included because it only pulled in the vulnerable `simple-websocket` and `ws` tree.
 - The embedded `/mocha` debug runner is disabled with HTTP `410` so the service does not ship a test runner as production runtime code.
