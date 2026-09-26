@@ -75,8 +75,8 @@ async function writeRuntimePackage(appTarget) {
       "jquery": "^3.7.1",
       "lusca": "^1.7.0",
       "mongoose": "6.13.11",
-      "morgan": "^1.10.0",
-      "multer": "^2.0.2",
+      "morgan": "1.12.0",
+      "multer": "2.4.0",
       "popper.js": "^1.16.1",
       "pug": "^3.0.3"
     }
