@@ -5,6 +5,7 @@ import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { packageBpmnServer } from "./package.mjs";
+import { verifyRuntimeMiddleware } from "./verify-runtime-middleware.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const platform = process.env.TARGET_PLATFORM ?? process.platform;
@@ -292,6 +293,7 @@ await mkdir(mongoExtractRoot, { recursive: true });
 
 extractArchive(artifact, bpmnExtractRoot);
 await verifyRuntimeDependencyLock(path.join(bpmnExtractRoot, "app"));
+await verifyRuntimeMiddleware(path.join(bpmnExtractRoot, "app"));
 verifyRuntimeAudit(path.join(bpmnExtractRoot, "app"));
 const mongoUrl = await latestReleaseAsset("service-lasso/lasso-mongo", mongoAssetName);
 await downloadFile(mongoUrl, mongoArchive);
