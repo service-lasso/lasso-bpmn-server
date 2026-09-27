@@ -1,5 +1,9 @@
 # BPMN Client Sample Decision
 
+## Canonical reader guidance
+
+Start with [app-owned service tasks](https://github.com/service-lasso/service-lasso/blob/develop/docs/components/app-service-tasks.md) for BPMN client calls in your consuming application. This page retains the BPMN runtime/API examples and the docs-only client decision. Migration: [BPMN #11](https://github.com/service-lasso/lasso-bpmn-server/issues/11), [Core #1419](https://github.com/service-lasso/service-lasso/issues/1419), reviewed source `f57db8af782862baf26febc604480f4006437672`. Source examples do not establish installed-runtime acceptance or publication.
+
 The reviewed `bpmn-client-sample` is a client script for calling a running BPMN Server API. It is not packaged as a separate Service Lasso service because it does not provide a daemon, healthcheck, UI, data directory, release-backed runtime, or standalone lifecycle contract.
 
 Use the existing `bpmn-server` service and call its API directly from your application, script, setup step, or test harness.
